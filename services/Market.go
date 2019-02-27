@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/huobiapi/REST-GO-demo/config"
-	"github.com/huobiapi/REST-GO-demo/models"
-	"github.com/huobiapi/REST-GO-demo/untils"
+	"github.com/zychappy/huobi-go-api/config"
+	"github.com/zychappy/huobi-go-api/models"
+	"github.com/zychappy/huobi-go-api/untils"
 )
 
 // 批量操作的API下个版本再封装
@@ -191,6 +191,16 @@ func GetAccounts() models.AccountsReturn {
 	return accountsReturn
 }
 
+func GetAccountsByCfg(cfg *config.Config) models.AccountsReturn {
+	accountsReturn := models.AccountsReturn{}
+
+	strRequest := "/v1/account/accounts"
+	jsonAccountsReturn := untils.ApiKeyGetByCfg(make(map[string]string), strRequest, cfg)
+	json.Unmarshal([]byte(jsonAccountsReturn), &accountsReturn)
+
+	return accountsReturn
+}
+
 // 根据账户ID查询账户余额
 // nAccountID: 账户ID, 不知道的话可以通过GetAccounts()获取, 可以只现货账户, C2C账户, 期货账户
 // return: BalanceReturn对象
@@ -199,6 +209,15 @@ func GetAccountBalance(strAccountID string) models.BalanceReturn {
 
 	strRequest := fmt.Sprintf("/v1/account/accounts/%s/balance", strAccountID)
 	jsonBanlanceReturn := untils.ApiKeyGet(make(map[string]string), strRequest)
+	json.Unmarshal([]byte(jsonBanlanceReturn), &balanceReturn)
+
+	return balanceReturn
+}
+func GetAccountBalanceByCfg(strAccountID string, cfg *config.Config) models.BalanceReturn {
+	balanceReturn := models.BalanceReturn{}
+
+	strRequest := fmt.Sprintf("/v1/account/accounts/%s/balance", strAccountID)
+	jsonBanlanceReturn := untils.ApiKeyGetByCfg(make(map[string]string), strRequest, cfg)
 	json.Unmarshal([]byte(jsonBanlanceReturn), &balanceReturn)
 
 	return balanceReturn

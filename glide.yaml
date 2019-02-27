@@ -1,4 +1,4 @@
-package: github.com/huobiapi/REST-GO-demo
+package: github.com/zychappy/huobi-go-api
 import:
 - package: github.com/dgrijalva/jwt-go
   version: ~3.2.0

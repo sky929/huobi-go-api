@@ -2,11 +2,12 @@ package services
 
 import (
 	"fmt"
+	"github.com/zychappy/huobi-go-api/config"
+	"strconv"
 	"strings"
 	"testing"
-	"strconv"
 
-	"github.com/huobiapi/REST-GO-demo/models"
+	"github.com/zychappy/huobi-go-api/models"
 )
 
 func TestPlaceOrder(t *testing.T) {
@@ -54,11 +55,27 @@ func TestPlaceOrder(t *testing.T) {
 	}
 }
 
-func Test_getSymbols(t *testing.T)  {
+func Test_getSymbols(t *testing.T) {
 	symbols := GetSymbols()
 	if symbols.Status != "ok" {
 		t.Error("failed to get symbols")
 	} else {
 		t.Logf("toal symbols: %v", len(symbols.Data))
 	}
+}
+
+func TestGetAccountBalance(t *testing.T) {
+	//2619432   现货
+	//4942602 otc
+	res := GetAccountBalance("4942602")
+	t.Log(res)
+
+}
+
+func TestGetAccountBalanceByCfg(t *testing.T) {
+	cfg := &config.Config{
+		"00171493-e390f9e7-378efc78-eb742", "51ea6758-c16a9c80-d9b75ea9-c6426", "https://api.huobi.pro", "api.huobi.pro", false, "",
+	}
+	res := GetAccountBalanceByCfg("2619432", cfg)
+	t.Log(res)
 }
