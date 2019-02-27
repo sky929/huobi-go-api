@@ -93,20 +93,20 @@ func HttpPostRequest(strUrl string, mapParams map[string]string) string {
 // mapParams: map类型的请求参数, key:value
 // strRequest: API路由路径
 // return: 请求结果
-func ApiKeyGet(mapParams map[string]string, strRequestPath string, cfg *config.Config) string {
+func ApiKeyGet(mapParams map[string]string, strRequestPath string) string {
 	strMethod := "GET"
 	timestamp := time.Now().UTC().Format("2006-01-02T15:04:05")
 
-	mapParams["AccessKeyId"] = cfg.AssKey
+	mapParams["AccessKeyId"] = config.ACCESS_KEY
 	mapParams["SignatureMethod"] = "HmacSHA256"
 	mapParams["SignatureVersion"] = "2"
 	mapParams["Timestamp"] = timestamp
 
 	hostName := config.HOST_NAME
-	mapParams["Signature"] = CreateSign(mapParams, strMethod, hostName, strRequestPath, cfg.SecretKey)
+	mapParams["Signature"] = CreateSign(mapParams, strMethod, hostName, strRequestPath, config.SECRET_KEY)
 
-	if cfg.IsPrivateSinatrue == true {
-		privateSignature, err := CreatePrivateSignByJWT(mapParams["Signature"], cfg.PrivateKeyPrime256)
+	if config.ENABLE_PRIVATE_SIGNATURE == true {
+		privateSignature, err := CreatePrivateSignByJWT(mapParams["Signature"])
 		if nil == err {
 			mapParams["PrivateSignature"] = privateSignature
 		} else {
@@ -131,8 +131,8 @@ func ApiKeyGetByCfg(mapParams map[string]string, strRequestPath string, cfg *con
 	hostName := cfg.HostUrl
 	mapParams["Signature"] = CreateSign(mapParams, strMethod, hostName, strRequestPath, cfg.SecretKey)
 
-	if cfg.IsPrivateSinatrue == true {
-		privateSignature, err := CreatePrivateSignByJWT(mapParams["Signature"], cfg.PrivateKeyPrime256)
+	if config.ENABLE_PRIVATE_SIGNATURE == true {
+		privateSignature, err := CreatePrivateSignByJWT(mapParams["Signature"])
 		if nil == err {
 			mapParams["PrivateSignature"] = privateSignature
 		} else {
@@ -149,22 +149,22 @@ func ApiKeyGetByCfg(mapParams map[string]string, strRequestPath string, cfg *con
 // mapParams: map类型的请求参数, key:value
 // strRequest: API路由路径
 // return: 请求结果
-func ApiKeyPost(mapParams map[string]string, strRequestPath string, cfg *config.Config) string {
+func ApiKeyPost(mapParams map[string]string, strRequestPath string) string {
 	strMethod := "POST"
 	timestamp := time.Now().UTC().Format("2006-01-02T15:04:05")
 
 	mapParams2Sign := make(map[string]string)
-	mapParams2Sign["AccessKeyId"] = cfg.AssKey
+	mapParams2Sign["AccessKeyId"] = config.ACCESS_KEY
 	mapParams2Sign["SignatureMethod"] = "HmacSHA256"
 	mapParams2Sign["SignatureVersion"] = "2"
 	mapParams2Sign["Timestamp"] = timestamp
 
 	hostName := config.HOST_NAME
 
-	mapParams2Sign["Signature"] = CreateSign(mapParams2Sign, strMethod, hostName, strRequestPath, cfg.SecretKey)
+	mapParams2Sign["Signature"] = CreateSign(mapParams2Sign, strMethod, hostName, strRequestPath, config.SECRET_KEY)
 
-	if cfg.IsPrivateSinatrue == true {
-		privateSignature, err := CreatePrivateSignByJWT(mapParams2Sign["Signature"], cfg.PrivateKeyPrime256)
+	if config.ENABLE_PRIVATE_SIGNATURE == true {
+		privateSignature, err := CreatePrivateSignByJWT(mapParams2Sign["Signature"])
 
 		if nil == err {
 			mapParams2Sign["PrivateSignature"] = privateSignature
@@ -197,8 +197,8 @@ func CreateSign(mapParams map[string]string, strMethod, strHostUrl, strRequestPa
 	return ComputeHmac256(strPayload, strSecretKey)
 }
 
-func CreatePrivateSignByJWT(sign, privateKeyPrime256 string) (string, error) {
-	return SignByJWT(privateKeyPrime256, sign)
+func CreatePrivateSignByJWT(sign string) (string, error) {
+	return SignByJWT(config.PRIVATE_KEY_PRIME_256, sign)
 }
 
 // 对Map按着ASCII码进行排序
